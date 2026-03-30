@@ -89,6 +89,9 @@ class AuthService {
         if (!is_same_password) {
             throw new ServerError('Contraseña incorrecta', 401);
         }
+        if (!user.email_verified) {
+            throw new ServerError('Debes verificar tu correo electronico antes de iniciar sesion', 403);
+        }
         
         const auth_token = jwt.sign(
             {
