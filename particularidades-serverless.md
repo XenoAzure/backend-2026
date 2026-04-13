@@ -1,0 +1,3 @@
+- Los procesos asincronos si el server responden tienden a morir.
+- Cron-jobs (Tareas cronometradas): EJ, cada 24hrs llama a la api de precios de ML y ajusta los de la DB (Sincronizacion).
+- Websockets => Recomiendo railway o algo que NO sea serverless

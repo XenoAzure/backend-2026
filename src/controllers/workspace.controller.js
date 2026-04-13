@@ -1,5 +1,6 @@
 import ServerError from "../helpers/error.helper.js"
 import workspaceMemberRepository from "../repository/member.repository.js"
+import workspaceRepository from "../repository/workspace.repository.js"
 
 class WorkspaceController {
     async getWorkspaces(request, response) {
@@ -41,6 +42,113 @@ class WorkspaceController {
                     }
                 )
             }
+        }
+    }
+
+    async createWorkspace(request, response) {
+        try {
+            const user = request.user;
+            const { title, description } = request.body;
+
+            if (!title) {
+                return response.status(400).json({
+                    ok: false,
+                    status: 400,
+                    message: "El título es obligatorio"
+                });
+            }
+
+            const workspace = await workspaceRepository.create(title, description, null, true);
+            await workspaceMemberRepository.create(workspace._id, user.id, 'admin');
+
+            return response.status(200).json({
+                ok: true,
+                message: "Espacio de trabajo creado exitosamente",
+                status: 200
+            });
+        } catch (error) {
+            console.error('Error in createWorkspace', error);
+            if (error instanceof ServerError) {
+                return response.status(error.status).json({
+                    ok: false,
+                    status: error.status,
+                    message: error.message
+                });
+            } else {
+                return response.status(500).json({
+                    ok: false,
+                    status: 500,
+                    message: "Internal server error"
+                });
+            }
+        }
+    }
+
+    async getWorkspaceById(request, response) {
+        try {
+            const { workspace_id } = request.params;
+
+            const workspace = await workspaceRepository.getById(workspace_id);
+            if (!workspace) {
+                return response.status(404).json({
+                    ok: false,
+                    status: 404,
+                    message: "Espacio de trabajo no encontrado"
+                });
+            }
+
+            const members = await workspaceMemberRepository.getMemberList(workspace_id);
+
+            return response.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Datos del espacio de trabajo obtenidos",
+                data: {
+                    workspace: {
+                        _id: workspace._id,
+                        title: workspace.title,
+                        description: workspace.description,
+                        url_image: workspace.url_image
+                    },
+                    members
+                }
+            });
+        } catch (error) {
+            console.error('Error in getWorkspaceById', error);
+            if (error instanceof ServerError) {
+                return response.status(error.status).json({
+                    ok: false,
+                    status: error.status,
+                    message: error.message
+                });
+            } else {
+                return response.status(500).json({
+                    ok: false,
+                    status: 500,
+                    message: "Internal server error"
+                });
+            }
+        }
+    }
+
+    async deleteWorkspace(request, response) {
+        try {
+            const { workspace_id } = request.params;
+            
+            await workspaceRepository.deleteById(workspace_id);
+            
+            return response.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Espacio de trabajo eliminado exitosamente"
+            });
+        } catch (error) {
+            console.error('Error in deleteWorkspace', error);
+            return response.status(500).json({
+                ok: false,
+                status: 500,
+                message: "Internal server error"
+            });
         }
     }
 }

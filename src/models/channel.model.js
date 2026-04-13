@@ -15,7 +15,7 @@ const channelSchema = new mongoose.Schema(
             ref: 'Workspace',
             required: true,
         },
-        name: {
+        title: {
             type: String,
             required: true,
         },

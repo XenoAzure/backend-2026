@@ -1,0 +1,10 @@
+- src: Codigo fuente del proyecto, ahi van los archivos relacionados a logica y funcionalidad del proyecto
+- src/config: Modulos de configuracion de servicios (internos o externos), ejemplo la conexion con la DB
+- src/controllers: Modulos relacionados a los controladores del servidor/API, basicamente donde manejamos las consultas y respuestas
+- src/helpers: Tambien se lo suele llamar "utils", basicamente son funciones utilitarias variadas, ejemplo alguna funcion del estilo validarDNI() o obtenerFechaActualAR(). Pensalas como una caja de herramientas donde podes encontrar de todo.
+- src/middlewares: Los middlewares custom de nuestra aplicacion
+- src/models: El shaping (forma) de la DB, basicamente x tabla o coleccion tiene x forma o formato (En el caso actual guardamos modelos de mongoose)
+- src/repository: Guardar funciones relacionadas a la interaccion con la DB
+- src/routes: Rutas de la aplicacion (API)
+- src/services: Las funciones que tienen logica de negocio. EJEMPLO: Un login, actualizar un perfil, enviar un mensaje. ETC
+- src/main.js: Tambien llamado como app.js o index.js es el punto de entrada de la aplicacion. Cuando la app prende el primer archivo en ejecutarse es el punto de entrada (Entry point).

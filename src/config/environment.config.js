@@ -8,6 +8,7 @@ const ENVIRONMENT = {
     MAIL_USER: process.env.MAIL_USER,
     MAIL_PASSWORD: process.env.MAIL_PASSWORD,
     URL_BACKEND: process.env.URL_BACKEND,
+    URL_FRONTEND: process.env.URL_FRONTEND,
     JWT_SECRET_KEY: process.env.JWT_SECRET_KEY
 }
 
