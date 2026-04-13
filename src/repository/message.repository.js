@@ -18,7 +18,7 @@ class MessageRepository {
                     select: 'name email'
                 }
             })
-            .sort({ created_at: 1 }); // Sort by creation date ascending
+            .sort({ created_at: 1 });
     }
 }
 

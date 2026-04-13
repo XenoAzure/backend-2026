@@ -84,8 +84,13 @@ class MemberController {
                 return response.status(404).json({ ok: false, status: 404, message: "Miembro no encontrado" });
             }
 
+            // Revisar si el miembro esta en pendiente, si esta en algo DISTINTO A PENDIENTE NO DEJAR QUE LA ACCION CAMBIE AL MIEMBRO
             if (member.status !== 'pending') {
                 return response.status(400).json({ ok: false, status: 400, message: "El usuario ya ha tomado una decisión previamente" });
+            }
+
+            if (action !== 'accepted' && action !== 'rejected') {
+                return response.status(400).json({ ok: false, status: 400, message: "Acción no válida" });
             }
 
             await workspaceMemberRepository.updateStatusById(member_id, action);
@@ -124,7 +129,7 @@ class MemberController {
     async deleteMember(request, response) {
         try {
             const { member_id } = request.params;
-            const authenticatedUserMember = request.workspaceMembership; // Agregado por el middleware verifyMemberWorkspaceMiddleware
+            const authenticatedUserMember = request.workspaceMembership;
             
             const memberToDelete = await workspaceMemberRepository.getById(member_id);
             if (!memberToDelete) {
@@ -132,14 +137,17 @@ class MemberController {
             }
 
             const isSameUser = memberToDelete.fk_id_user.toString() === authenticatedUserMember.fk_id_user.toString();
-            const isAdminOrOwner = ['admin', 'owner'].includes(authenticatedUserMember.role.toLowerCase());
+            const authenticatedRole = authenticatedUserMember.role.toLowerCase();
+            const targetRole = memberToDelete.role.toLowerCase();
 
-            if (!isSameUser && !isAdminOrOwner) {
+            // Solo dueños, administradores o el mismo usuario pueden eliminar
+            if (authenticatedRole !== 'owner' && authenticatedRole !== 'admin' && !isSameUser) {
                 return response.status(403).json({ ok: false, status: 403, message: "No tienes permisos para eliminar a este miembro" });
             }
 
-            if (!isSameUser && memberToDelete.role.toLowerCase() === 'owner') {
-                return response.status(403).json({ ok: false, status: 403, message: "Un administrador no puede eliminar a un owner" });
+            // Un administrador NO puede eliminar a un dueño
+            if (authenticatedRole === 'admin' && targetRole === 'owner' && !isSameUser) {
+                return response.status(403).json({ ok: false, status: 403, message: "Un administrador no puede eliminar a un dueño" });
             }
 
             await workspaceMemberRepository.deleteById(member_id);
@@ -161,6 +169,7 @@ class MemberController {
             const { role } = request.body;
             const authenticatedUserMember = request.workspaceMembership;
 
+            // NO se puede actualizar a 'owner'
             if (role === 'owner') {
                 return response.status(400).json({ ok: false, status: 400, message: "No puedes asignar el rol owner" });
             }
@@ -170,12 +179,17 @@ class MemberController {
                 return response.status(404).json({ ok: false, status: 404, message: "Miembro no encontrado" });
             }
 
+            // Solo admins y dueños pueden actualizar el role de otros miembros, excepto el suyo
             if (memberToUpdate.fk_id_user.toString() === authenticatedUserMember.fk_id_user.toString()) {
                 return response.status(403).json({ ok: false, status: 403, message: "No puedes cambiar tu propio rol por este medio" });
             }
 
-            if (memberToUpdate.role.toLowerCase() === 'owner') {
-                return response.status(403).json({ ok: false, status: 403, message: "No puedes cambiar el rol de un owner" });
+            const authenticatedRole = authenticatedUserMember.role.toLowerCase();
+            const targetRole = memberToUpdate.role.toLowerCase();
+
+            // Admin no puede actualizar a dueño
+            if (authenticatedRole === 'admin' && targetRole === 'owner') {
+                return response.status(403).json({ ok: false, status: 403, message: "Un administrador no puede actualizar el rol de un dueño" });
             }
 
             const updatedMember = await workspaceMemberRepository.updateRoleById(member_id, role);

@@ -5,7 +5,14 @@ import verifyMemberWorkspaceMiddleware, { verifyMemberWorkspaceRoleMiddleware } 
 
 const memberRouter = Router({ mergeParams: true });
 
-// Invitar miembro (solo admins o owners)
+// Invitar miembro (POST / y /invite aceptados)
+memberRouter.post(
+    '/',
+    authMiddleware,
+    verifyMemberWorkspaceRoleMiddleware(['owner', 'admin']),
+    memberController.inviteMember
+);
+
 memberRouter.post(
     '/invite',
     authMiddleware,
@@ -13,21 +20,21 @@ memberRouter.post(
     memberController.inviteMember
 );
 
-// Aceptar invitación vía email (GET request sin auth header necesario)
-memberRouter.get(
-    '/handle-invitation',
-    memberController.handleInvitation
-);
-
-// Obtener lista de miembros
+// Obtener lista de miembros O Aceptar invitación vía email (?token=ey)
 memberRouter.get(
     '/',
+    (request, response, next) => {
+        if (request.query.token) {
+            return memberController.handleInvitation(request, response);
+        }
+        next();
+    },
     authMiddleware,
     verifyMemberWorkspaceMiddleware,
     memberController.getMembersList
 );
 
-// Eliminar miembro (requiere verificación extra en controller para ver si es uno mismo o admin/owner)
+// Eliminar miembro
 memberRouter.delete(
     '/:member_id',
     authMiddleware,
@@ -35,7 +42,7 @@ memberRouter.delete(
     memberController.deleteMember
 );
 
-// Actualizar rol de miembro (solo admin o owner)
+// Actualizar rol de miembro
 memberRouter.put(
     '/:member_id',
     authMiddleware,
