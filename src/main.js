@@ -13,6 +13,7 @@ import mailerTransporter from "./config/mailer.config.js"
 import cors from 'cors'
 import authMiddleware from "./middlewares/authMiddleware.js"
 import workspaceRouter from "./routes/workspace.router.js"
+import userRouter from "./routes/user.router.js"
 
 
 connectMongoDB()
@@ -32,6 +33,7 @@ Delegamos las consultas que vengan sobre '/api/health' al healthRouter
 app.use('/api/health', healthRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/workspace', workspaceRouter)
+app.use('/api/user', userRouter)
 
 app.get(
     '/api/test',

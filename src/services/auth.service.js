@@ -10,6 +10,7 @@ import mailerTransporter from "../config/mailer.config.js";
 import ServerError from "../helpers/error.helper.js";
 import userRepository from "../repository/user.repository.js";
 import bcrypt from 'bcrypt'
+import { getResetPasswordEmailTemplate, getVerificationEmailTemplate } from '../helpers/email.helper.js';
 
 class AuthService {
     async register({ name, email, password }) {
@@ -123,12 +124,7 @@ class AuthService {
                 from: ENVIRONMENT.MAIL_USER,
                 to: email,
                 subject: `Bienvenido ${name} verifica tu correo electronico`,
-                html: `
-                    <h1>Bienvenido ${name}</h1>
-                    <p>Te has registrado correctamente, necesitamos verificar tu correo electronico</p>
-                    <a href="${ENVIRONMENT.URL_BACKEND + `/api/auth/verify-email?verify_email_token=${verify_email_token}`}">Click aqui para verificar</a>
-                    <span>Si no reconoces este registro desestima este mail.</span>
-                `
+                html: getVerificationEmailTemplate(name, `${ENVIRONMENT.URL_BACKEND}/api/auth/verify-email?verify_email_token=${verify_email_token}`)
             }
         )
 
@@ -158,12 +154,7 @@ class AuthService {
                 from: ENVIRONMENT.MAIL_USER,
                 to: email,
                 subject: "Restablecimiento de contraseña",
-                html: `
-                    <h1> Restablecimiento de contraseña</h1>
-                    <p>Has solicitado restablecer tu contraseña. Haz clic en el enlace para hacerlo</p>
-                    <a href="${ENVIRONMENT.URL_BACKEND + `/api/auth/reset-password/${reset_password_token}`}">Click aqui para restablecer</a>
-                    <span>Si no reconoces este registro, desestima este mail.</span>
-                `
+                html: getResetPasswordEmailTemplate(email, `${ENVIRONMENT.URL_BACKEND}/api/auth/reset-password/${reset_password_token}`)
             })
         } catch (error) {
             if (error instanceof ServerError) {
