@@ -29,6 +29,18 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: false,
             default: ''
+        },
+        bio: {
+            type: String,
+            required: false,
+            default: '',
+            maxLength: 300
+        },
+        social_links: {
+            twitter: { type: String, default: '' },
+            youtube: { type: String, default: '' },
+            github: { type: String, default: '' },
+            steam: { type: String, default: '' }
         }
     }
 )
