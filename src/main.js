@@ -14,6 +14,7 @@ import cors from 'cors'
 import authMiddleware from "./middlewares/authMiddleware.js"
 import workspaceRouter from "./routes/workspace.router.js"
 import userRouter from "./routes/user.router.js"
+import dmRouter from "./routes/dm.router.js"
 
 
 connectMongoDB()
@@ -34,6 +35,7 @@ app.use('/api/health', healthRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/workspace', workspaceRouter)
 app.use('/api/user', userRouter)
+app.use('/api/dm', dmRouter)
 
 app.get(
     '/api/test',

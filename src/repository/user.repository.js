@@ -32,6 +32,11 @@ class UserRepository {
         return user
     }
 
+    async getByPublicId(public_id) {
+        const user = await User.findOne({public_id: public_id})
+        return user
+    }
+
     //llama a algun usuario de la DB
     async getUser(){
         const user = await User.findOne()

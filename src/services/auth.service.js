@@ -154,7 +154,7 @@ class AuthService {
                 from: ENVIRONMENT.MAIL_USER,
                 to: email,
                 subject: "Restablecimiento de contraseña",
-                html: getResetPasswordEmailTemplate(email, `${ENVIRONMENT.URL_BACKEND}/api/auth/reset-password/${reset_password_token}`)
+                html: getResetPasswordEmailTemplate(email, `${ENVIRONMENT.URL_FRONTEND}/reset-password/${reset_password_token}`)
             })
         } catch (error) {
             if (error instanceof ServerError) {

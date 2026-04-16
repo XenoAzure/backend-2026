@@ -41,7 +41,28 @@ const userSchema = new mongoose.Schema(
             youtube: { type: String, default: '' },
             github: { type: String, default: '' },
             steam: { type: String, default: '' }
-        }
+        },
+        public_id: {
+            type: String,
+            unique: true,
+            required: true,
+            default: () => Math.random().toString(36).substring(2, 10).toUpperCase()
+        },
+        friends: [
+            { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        ],
+        muted_friends: [
+            { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        ],
+        muted_workspaces: [
+            { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace' }
+        ],
+        pending_requests: [
+            { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        ],
+        blocked_users: [
+            { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        ]
     }
 )
 //Lo asociamos a la coleccion de usuarios
