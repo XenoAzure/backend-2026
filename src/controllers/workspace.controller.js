@@ -151,6 +151,46 @@ class WorkspaceController {
             });
         }
     }
+    async updateWorkspace(request, response) {
+        try {
+            const { workspace_id } = request.params;
+            const { title, description } = request.body;
+
+            if (!title) {
+                return response.status(400).json({
+                    ok: false,
+                    status: 400,
+                    message: "El título es obligatorio"
+                });
+            }
+
+            const updatedWorkspace = await workspaceRepository.updateById(workspace_id, { title, description });
+
+            return response.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Espacio de trabajo actualizado exitosamente",
+                data: {
+                    workspace: updatedWorkspace
+                }
+            });
+        } catch (error) {
+            console.error('Error in updateWorkspace', error);
+            if (error instanceof ServerError) {
+                return response.status(error.status).json({
+                    ok: false,
+                    status: error.status,
+                    message: error.message
+                });
+            } else {
+                return response.status(500).json({
+                    ok: false,
+                    status: 500,
+                    message: "Internal server error"
+                });
+            }
+        }
+    }
 }
 
 const workspaceController = new WorkspaceController()
