@@ -1,5 +1,8 @@
 import ServerError from "../helpers/error.helper.js";
 import userRepository from "../repository/user.repository.js";
+import bcrypt from "bcrypt";
+import Workspace from "../models/workspace.model.js";
+import WorkspaceMember from "../models/workspaceMember.model.js";
 
 class UserController {
     async getMe(req, res) {
@@ -294,6 +297,95 @@ class UserController {
 
             return res.status(200).json({ ok: true, status: 200, message: "Usuario bloqueado" });
         } catch (error) {
+            return res.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+        }
+    }
+    async updatePassword(req, res) {
+        try {
+            const user_id = req.user.id;
+            const { current_password, new_password } = req.body;
+
+            if (!current_password || !new_password) {
+                throw new ServerError("Se requiere la contraseña actual y la nueva", 400);
+            }
+
+            if (new_password.length < 6) {
+                throw new ServerError("La nueva contraseña debe tener al menos 6 caracteres", 400);
+            }
+
+            const user = await userRepository.getById(user_id);
+            if (!user) {
+                throw new ServerError("Usuario no encontrado", 404);
+            }
+
+            const isValid = await bcrypt.compare(current_password, user.password);
+            if (!isValid) {
+                throw new ServerError("La contraseña actual es incorrecta", 400);
+            }
+
+            const hashedPassword = await bcrypt.hash(new_password, 10);
+            user.password = hashedPassword;
+            await user.save();
+
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Contraseña actualizada correctamente"
+            });
+        } catch (error) {
+            if (error instanceof ServerError) {
+                return res.status(error.status).json({ ok: false, status: error.status, message: error.message });
+            }
+            console.error("Error in updatePassword:", error);
+            return res.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+        }
+    }
+
+    async deleteMe(req, res) {
+        try {
+            const user_id = req.user.id;
+            const { current_password } = req.body;
+
+            if (!current_password) {
+                throw new ServerError("Se requiere la contraseña actual para eliminar la cuenta", 400);
+            }
+
+            const user = await userRepository.getById(user_id);
+            if (!user) {
+                throw new ServerError("Usuario no encontrado", 404);
+            }
+
+            const isValid = await bcrypt.compare(current_password, user.password);
+            if (!isValid) {
+                throw new ServerError("La contraseña es incorrecta", 400);
+            }
+
+            // Find workspaces owned by user
+            const ownedMemberships = await WorkspaceMember.find({ fk_id_user: user_id, role: 'owner' });
+            for (const membership of ownedMemberships) {
+                const workspaceId = membership.fk_id_workspace;
+                // Delete the workspace
+                await Workspace.findByIdAndDelete(workspaceId);
+                // Delete all memberships for this workspace
+                await WorkspaceMember.deleteMany({ fk_id_workspace: workspaceId });
+            }
+
+            // Delete all memberships of the user
+            await WorkspaceMember.deleteMany({ fk_id_user: user_id });
+
+            // Finally, delete the user
+            await userRepository.daleteById(user_id);
+
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Cuenta eliminada correctamente"
+            });
+        } catch (error) {
+            if (error instanceof ServerError) {
+                return res.status(error.status).json({ ok: false, status: error.status, message: error.message });
+            }
+            console.error("Error in deleteMe:", error);
             return res.status(500).json({ ok: false, status: 500, message: "Internal server error" });
         }
     }
