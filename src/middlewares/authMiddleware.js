@@ -25,35 +25,7 @@ function authMiddleware(request, response, next) {
         next()
     }
     catch (error) {
-        if( error instanceof jwt.JsonWebTokenError ){
-            return response.status(401).json(
-                {
-                    ok: false,
-                    status: 401,
-                    message: 'Token invalido'
-                }
-            )
-        }
-        //Errores esperables en el sistema
-        if (error instanceof ServerError) {
-            return response.status(error.status).json(
-                {
-                    ok: false,
-                    status: error.status,
-                    message: error.message
-                }
-            )
-        }
-        else {
-            console.error('Error inesperado en el registro', error)
-            return response.status(500).json(
-                {
-                    ok: false,
-                    status: 500,
-                    message: "Internal server error"
-                }
-            )
-        }
+        next(error)
     }
 
 }

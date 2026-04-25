@@ -2,7 +2,7 @@ import channelRepository from "../repository/channel.repository.js";
 import ServerError from "../helpers/error.helper.js";
 
 class ChannelController {
-    async createChannel(request, response) {
+    async createChannel(request, response, next) {
         try {
             const { workspace_id } = request.params;
             const { title, description } = request.body;
@@ -26,16 +26,11 @@ class ChannelController {
                 }
             });
         } catch (error) {
-            console.error("Error en createChannel", error);
-            return response.status(500).json({
-                ok: false,
-                status: 500,
-                message: "Error interno del servidor"
-            });
+            next(error);
         }
     }
 
-    async getChannels(request, response) {
+    async getChannels(request, response, next) {
         try {
             const { workspace_id } = request.params;
             
@@ -50,16 +45,11 @@ class ChannelController {
                 }
             });
         } catch (error) {
-            console.error("Error en getChannels", error);
-            return response.status(500).json({
-                ok: false,
-                status: 500,
-                message: "Error interno del servidor"
-            });
+            next(error);
         }
     }
 
-    async deleteChannel(request, response) {
+    async deleteChannel(request, response, next) {
         try {
             const { channel_id } = request.params;
 
@@ -71,12 +61,7 @@ class ChannelController {
                 message: "Canal eliminado exitosamente"
             });
         } catch (error) {
-            console.error("Error en deleteChannel", error);
-            return response.status(500).json({
-                ok: false,
-                status: 500,
-                message: "Error interno del servidor"
-            });
+            next(error);
         }
     }
 }

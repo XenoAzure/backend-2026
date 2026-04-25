@@ -4,7 +4,7 @@ import workspaceRepository from "../repository/workspace.repository.js"
 import channelRepository from "../repository/channel.repository.js"
 
 class WorkspaceController {
-    async getWorkspaces(request, response) {
+    async getWorkspaces(request, response, next) {
         try {
             //Cliente consultante
             const user = request.user
@@ -21,32 +21,12 @@ class WorkspaceController {
                     }
                 }
             )
-        }
-        catch (error) {
-            //Errores esperables en el sistema
-            if (error instanceof ServerError) {
-                return res.status(error.status).json(
-                    {
-                        ok: false,
-                        status: error.status,
-                        message: error.message
-                    }
-                )
-            }
-            else {
-                console.error('Error inesperado en el registro', error)
-                return res.status(500).json(
-                    {
-                        ok: false,
-                        status: 500,
-                        message: "Internal server error"
-                    }
-                )
-            }
+        } catch (error) {
+            next(error);
         }
     }
 
-    async createWorkspace(request, response) {
+    async createWorkspace(request, response, next) {
         try {
             const user = request.user;
             const { title, description } = request.body;
@@ -70,24 +50,11 @@ class WorkspaceController {
                 status: 200
             });
         } catch (error) {
-            console.error('Error in createWorkspace', error);
-            if (error instanceof ServerError) {
-                return response.status(error.status).json({
-                    ok: false,
-                    status: error.status,
-                    message: error.message
-                });
-            } else {
-                return response.status(500).json({
-                    ok: false,
-                    status: 500,
-                    message: "Internal server error"
-                });
-            }
+            next(error);
         }
     }
 
-    async getWorkspaceById(request, response) {
+    async getWorkspaceById(request, response, next) {
         try {
             const { workspace_id } = request.params;
 
@@ -117,24 +84,11 @@ class WorkspaceController {
                 }
             });
         } catch (error) {
-            console.error('Error in getWorkspaceById', error);
-            if (error instanceof ServerError) {
-                return response.status(error.status).json({
-                    ok: false,
-                    status: error.status,
-                    message: error.message
-                });
-            } else {
-                return response.status(500).json({
-                    ok: false,
-                    status: 500,
-                    message: "Internal server error"
-                });
-            }
+            next(error);
         }
     }
 
-    async deleteWorkspace(request, response) {
+    async deleteWorkspace(request, response, next) {
         try {
             const { workspace_id } = request.params;
             
@@ -146,15 +100,10 @@ class WorkspaceController {
                 message: "Espacio de trabajo eliminado exitosamente"
             });
         } catch (error) {
-            console.error('Error in deleteWorkspace', error);
-            return response.status(500).json({
-                ok: false,
-                status: 500,
-                message: "Internal server error"
-            });
+            next(error);
         }
     }
-    async updateWorkspace(request, response) {
+    async updateWorkspace(request, response, next) {
         try {
             const { workspace_id } = request.params;
             const { title, description } = request.body;
@@ -178,20 +127,7 @@ class WorkspaceController {
                 }
             });
         } catch (error) {
-            console.error('Error in updateWorkspace', error);
-            if (error instanceof ServerError) {
-                return response.status(error.status).json({
-                    ok: false,
-                    status: error.status,
-                    message: error.message
-                });
-            } else {
-                return response.status(500).json({
-                    ok: false,
-                    status: 500,
-                    message: "Internal server error"
-                });
-            }
+            next(error);
         }
     }
 }

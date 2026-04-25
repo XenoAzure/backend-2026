@@ -5,7 +5,7 @@ import Workspace from "../models/workspace.model.js";
 import WorkspaceMember from "../models/workspaceMember.model.js";
 
 class UserController {
-    async getMe(req, res) {
+    async getMe(req, res, next) {
         try {
             const user_id = req.user.id;
             let user = await userRepository.getById(user_id);
@@ -46,23 +46,11 @@ class UserController {
                 }
             });
         } catch (error) {
-            if (error instanceof ServerError) {
-                return res.status(error.status).json({
-                    ok: false,
-                    status: error.status,
-                    message: error.message
-                });
-            }
-            console.error("Error in getMe:", error);
-            return res.status(500).json({
-                ok: false,
-                status: 500,
-                message: "Internal server error"
-            });
+            next(error);
         }
     }
 
-    async updateMe(req, res) {
+    async updateMe(req, res, next) {
         try {
             const user_id = req.user.id;
             const { name, bio, profile_picture, social_links } = req.body;
@@ -101,23 +89,11 @@ class UserController {
                 }
             });
         } catch (error) {
-            if (error instanceof ServerError) {
-                return res.status(error.status).json({
-                    ok: false,
-                    status: error.status,
-                    message: error.message
-                });
-            }
-            console.error("Error in updateMe:", error);
-            return res.status(500).json({
-                ok: false,
-                status: 500,
-                message: "Internal server error"
-            });
+            next(error);
         }
     }
 
-    async addFriend(req, res) {
+    async addFriend(req, res, next) {
         try {
             const user_id = req.user.id;
             const { friend_public_id } = req.body;
@@ -162,14 +138,11 @@ class UserController {
                 }
             });
         } catch (error) {
-            if (error instanceof ServerError) {
-                return res.status(error.status).json({ ok: false, status: error.status, message: error.message });
-            }
-            return res.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
 
-    async removeFriend(req, res) {
+    async removeFriend(req, res, next) {
         try {
             const user_id = req.user.id;
             const { friend_id } = req.params;
@@ -185,7 +158,7 @@ class UserController {
         }
     }
 
-    async toggleMuteFriend(req, res) {
+    async toggleMuteFriend(req, res, next) {
         try {
             const user_id = req.user.id;
             const { friend_id } = req.params;
@@ -202,11 +175,11 @@ class UserController {
 
             return res.status(200).json({ ok: true, status: 200, message: isMuted ? "Amigo no muteado" : "Amigo muteado" });
         } catch (error) {
-            return res.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
 
-    async toggleMuteWorkspace(req, res) {
+    async toggleMuteWorkspace(req, res, next) {
         try {
             const user_id = req.user.id;
             const { workspace_id } = req.params;
@@ -223,10 +196,10 @@ class UserController {
 
             return res.status(200).json({ ok: true, status: 200, message: isMuted ? "Workspace no muteado" : "Workspace muteado" });
         } catch (error) {
-            return res.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
-    async acceptFriendRequest(req, res) {
+    async acceptFriendRequest(req, res, next) {
         try {
             const user_id = req.user.id;
             const { request_id } = req.params;
@@ -252,11 +225,11 @@ class UserController {
 
             return res.status(200).json({ ok: true, status: 200, message: "Solicitud aceptada" });
         } catch (error) {
-            return res.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
 
-    async declineFriendRequest(req, res) {
+    async declineFriendRequest(req, res, next) {
         try {
             const user_id = req.user.id;
             const { request_id } = req.params;
@@ -267,11 +240,11 @@ class UserController {
 
             return res.status(200).json({ ok: true, status: 200, message: "Solicitud rechazada" });
         } catch (error) {
-            return res.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
 
-    async blockUser(req, res) {
+    async blockUser(req, res, next) {
         try {
             const user_id = req.user.id;
             const { request_id } = req.params;
@@ -297,10 +270,10 @@ class UserController {
 
             return res.status(200).json({ ok: true, status: 200, message: "Usuario bloqueado" });
         } catch (error) {
-            return res.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
-    async updatePassword(req, res) {
+    async updatePassword(req, res, next) {
         try {
             const user_id = req.user.id;
             const { current_password, new_password } = req.body;
@@ -333,15 +306,11 @@ class UserController {
                 message: "Contraseña actualizada correctamente"
             });
         } catch (error) {
-            if (error instanceof ServerError) {
-                return res.status(error.status).json({ ok: false, status: error.status, message: error.message });
-            }
-            console.error("Error in updatePassword:", error);
-            return res.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
 
-    async deleteMe(req, res) {
+    async deleteMe(req, res, next) {
         try {
             const user_id = req.user.id;
             const { current_password } = req.body;
@@ -382,11 +351,7 @@ class UserController {
                 message: "Cuenta eliminada correctamente"
             });
         } catch (error) {
-            if (error instanceof ServerError) {
-                return res.status(error.status).json({ ok: false, status: error.status, message: error.message });
-            }
-            console.error("Error in deleteMe:", error);
-            return res.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
 }

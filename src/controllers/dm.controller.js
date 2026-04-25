@@ -2,7 +2,7 @@ import DirectMessage from "../models/directMessage.model.js";
 import ServerError from "../helpers/error.helper.js";
 
 class DMController {
-    async getMessages(req, res) {
+    async getMessages(req, res, next) {
         try {
             const user_id = req.user.id;
             const { friend_id } = req.params;
@@ -18,12 +18,11 @@ class DMController {
 
             return res.status(200).json({ ok: true, status: 200, data: { messages } });
         } catch (error) {
-            console.error("Error in getMessages:", error);
-            return res.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
 
-    async sendMessage(req, res) {
+    async sendMessage(req, res, next) {
         try {
             const user_id = req.user.id;
             const { friend_id } = req.params;
@@ -48,11 +47,7 @@ class DMController {
                 data: { message: newMessage }
             });
         } catch (error) {
-            if (error instanceof ServerError) {
-                return res.status(error.status).json({ ok: false, status: error.status, message: error.message });
-            }
-            console.error("Error in sendMessage:", error);
-            return res.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
 }

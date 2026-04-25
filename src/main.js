@@ -15,6 +15,7 @@ import authMiddleware from "./middlewares/authMiddleware.js"
 import workspaceRouter from "./routes/workspace.router.js"
 import userRouter from "./routes/user.router.js"
 import dmRouter from "./routes/dm.router.js"
+import errorHandlerMiddleware from "./middlewares/errorHandler.middleware.js"
 
 
 connectMongoDB()
@@ -46,6 +47,8 @@ app.get(
         response.send('ok, vos sos: ' + user.id)
     }
 )
+
+app.use(errorHandlerMiddleware)
 
 app.listen(
     ENVIRONMENT.PORT,

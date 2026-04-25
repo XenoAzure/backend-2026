@@ -11,7 +11,7 @@ class HealthController {
         )
     }
 
-    async getDB (request, response){
+    async getDB (request, response, next){
         try{
             await userRepository.getUser()
             return response.status(200).json(
@@ -23,14 +23,7 @@ class HealthController {
             )
         }
         catch(error){
-            console.error("ERROR EN LA DB:", error)
-            return response.status(500).json(
-                {
-                    message: 'La DB esta fallando, contactarse con el administrador',
-                    status: 500,
-                    ok: false
-                }
-            )
+            next(error)
         }
     }
 

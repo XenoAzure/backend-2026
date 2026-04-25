@@ -54,22 +54,24 @@ class WorkspaceMemberRepository {
         const members = await WorkspaceMember.find({ fk_id_workspace: fk_id_workspace })
         .populate('fk_id_user', 'name email profile_picture public_id')
         
-        const members_mapped = members.map(
-            (member) => {
-                return {
-                    member_id: member._id,
-                    member_role: member.role,
-                    member_status: member.status,
-                    member_created_at: member.created_at,
-                    
-                    user_id: member.fk_id_user._id,
-                    user_name: member.fk_id_user.name,
-                    user_email: member.fk_id_user.email,
-                    user_profile_picture: member.fk_id_user.profile_picture || null,
-                    user_public_id: member.fk_id_user.public_id || null
+        const members_mapped = members
+            .filter(member => member.fk_id_user) // Filtrar si el usuario ya no existe
+            .map(
+                (member) => {
+                    return {
+                        member_id: member._id,
+                        member_role: member.role,
+                        member_status: member.status,
+                        member_created_at: member.created_at,
+                        
+                        user_id: member.fk_id_user._id,
+                        user_name: member.fk_id_user.name,
+                        user_email: member.fk_id_user.email,
+                        user_profile_picture: member.fk_id_user.profile_picture || null,
+                        user_public_id: member.fk_id_user.public_id || null
+                    }
                 }
-            }
-        )
+            )
         return members_mapped
     }
 
@@ -79,19 +81,21 @@ class WorkspaceMemberRepository {
         const members = await WorkspaceMember.find({fk_id_user: user_id})
         .populate('fk_id_workspace')
 
-        const members_mapped = members.map(
-            (member) => {
-                return {
-                    member_id: member._id,
-                    member_role: member.role,
-                    member_created_at: member.created_at,
-                    
-                    workspace_id: member.fk_id_workspace._id,
-                    workspace_title: member.fk_id_workspace.title,
-                    workspace_description: member.fk_id_workspace.description
+        const members_mapped = members
+            .filter(member => member.fk_id_workspace) // Filtrar si el workspace ya no existe
+            .map(
+                (member) => {
+                    return {
+                        member_id: member._id,
+                        member_role: member.role,
+                        member_created_at: member.created_at,
+                        
+                        workspace_id: member.fk_id_workspace._id,
+                        workspace_title: member.fk_id_workspace.title,
+                        workspace_description: member.fk_id_workspace.description
+                    }
                 }
-            }
-        )
+            )
 
         return members_mapped
     }

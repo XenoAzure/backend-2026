@@ -1,7 +1,7 @@
 import messageRepository from "../repository/message.repository.js";
 
 class MessageController {
-    async createMessage(request, response) {
+    async createMessage(request, response, next) {
         try {
             const { channel_id } = request.params;
             const { content, attachment } = request.body;
@@ -24,16 +24,11 @@ class MessageController {
                 data: { message }
             });
         } catch (error) {
-            console.error("Error en createMessage", error);
-            return response.status(500).json({
-                ok: false,
-                status: 500,
-                message: "Error interno del servidor"
-            });
+            next(error);
         }
     }
 
-    async getMessages(request, response) {
+    async getMessages(request, response, next) {
         try {
             const { channel_id } = request.params;
 
@@ -61,12 +56,7 @@ class MessageController {
                 data: { messages: mappedMessages }
             });
         } catch (error) {
-            console.error("Error en getMessages", error);
-            return response.status(500).json({
-                ok: false,
-                status: 500,
-                message: "Error interno del servidor"
-            });
+            next(error);
         }
     }
 }

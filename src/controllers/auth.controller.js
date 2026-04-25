@@ -4,7 +4,7 @@ import authService from "../services/auth.service.js";
 import ENVIRONMENT from "../config/environment.config.js";
 
 class AuthController {
-    async register(req, res) {
+    async register(req, res, next) {
 
         try {
 
@@ -17,33 +17,13 @@ class AuthController {
                 status: 201,
                 message: "El usuario se ha creado exitosamente",
             });
-        }
-        catch (error) {
-            //Errores esperables en el sistema
-            if (error instanceof ServerError) {
-                return res.status(error.status).json(
-                    {
-                        ok: false,
-                        status: error.status,
-                        message: error.message
-                    }
-                )
-            }
-            else {
-                console.error('Error inesperado en el registro', error)
-                return res.status(500).json(
-                    {
-                        ok: false,
-                        status: 500,
-                        message: "Internal server error"
-                    }
-                )
-            }
+        } catch (error) {
+            next(error);
         }
     }
 
 
-    async login(req, res) {
+    async login(req, res, next) {
         try {
             const { email, password } = req.body;
             const auth_token = await authService.login({ email, password })
@@ -55,32 +35,12 @@ class AuthController {
                     auth_token: auth_token
                 }
             });
-        }
-        catch (error) {
-            //Errores esperables en el sistema
-            if (error instanceof ServerError) {
-                return res.status(error.status).json(
-                    {
-                        ok: false,
-                        status: error.status,
-                        message: error.message
-                    }
-                )
-            }
-            else {
-                console.error('Error inesperado en el login', error)
-                return res.status(500).json(
-                    {
-                        ok: false,
-                        status: 500,
-                        message: "Internal server error"
-                    }
-                )
-            }
+        } catch (error) {
+            next(error);
         }
     }
 
-    async verifyEmail(request, response) {
+    async verifyEmail(request, response, next) {
         try {
             const { verify_email_token } = request.query
 
@@ -168,34 +128,13 @@ class AuthController {
             `;
 
             response.status(200).send(htmlResponse);
-        }
-        catch (error) {
-            //Errores esperables en el sistema
-            if (error instanceof ServerError) {
-                return response.status(error.status).json(
-                    {
-                        ok: false,
-                        status: error.status,
-                        message: error.message
-                    }
-                )
-            }
-
-            else {
-                console.error('Error inesperado en el login', error)
-                return response.status(500).json(
-                    {
-                        ok: false,
-                        status: 500,
-                        message: "Internal server error"
-                    }
-                )
-            }
+        } catch (error) {
+            next(error);
         }
 
     }
 
-    async resetPasswordRequest(req, res) {
+    async resetPasswordRequest(req, res, next) {
         try {
             const { email } = req.body;
             await authService.resetPasswordRequest({ email });
@@ -205,23 +144,11 @@ class AuthController {
                 message: "Se ha enviado un correo electrónico para restablecer la contraseña",
             });
         } catch (error) {
-            if (error instanceof ServerError) {
-                return res.status(error.status).json({
-                    ok: false,
-                    status: error.status,
-                    message: error.message,
-                });
-            }
-            console.log(error)
-            return res.status(500).json({
-                ok: false,
-                status: 500,
-                message: "Error al solicitar el restablecimiento de contraseña",
-            })
+            next(error);
         }
     }
 
-    async resetPassword(req, res) {
+    async resetPassword(req, res, next) {
         try {
             const { reset_password_token } = req.params;
             const { password } = req.body;
@@ -232,18 +159,7 @@ class AuthController {
                 message: "La contraseña se ha restablecido exitosamente",
             });
         } catch (error) {
-            if (error instanceof ServerError) {
-                return res.status(error.status).json({
-                    ok: false,
-                    status: error.status,
-                    message: error.message,
-                });
-            }
-            return res.status(500).json({
-                ok: false,
-                status: 500,
-                message: "Error al restablecer la contraseña",
-            })
+            next(error);
         }
     }
 

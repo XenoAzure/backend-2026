@@ -5,7 +5,7 @@ import ENVIRONMENT from "../config/environment.config.js";
 import jwt from "jsonwebtoken";
 
 class MemberController {
-    async inviteMember(request, response) {
+    async inviteMember(request, response, next) {
         try {
             const { workspace_id } = request.params;
             const { email_or_id, role = 'user' } = request.body;
@@ -45,13 +45,12 @@ class MemberController {
                 message: `${invitedUser.name} ha sido añadido al espacio de trabajo como ${role.toLowerCase()}.`
             });
         } catch (error) {
-            console.error("Error en inviteMember", error);
-            return response.status(500).json({ ok: false, status: 500, message: "Error interno del servidor" });
+            next(error);
         }
     }
 
 
-    async handleInvitation(request, response) {
+    async handleInvitation(request, response, next) {
         try {
             const { token } = request.query;
 
@@ -84,15 +83,11 @@ class MemberController {
                 message: action === 'accepted' ? "Has aceptado la invitación con éxito" : "Has rechazado la invitación"
             });
         } catch (error) {
-            if (error instanceof jwt.JsonWebTokenError) {
-                return response.status(401).json({ ok: false, status: 401, message: 'Token invalido o expirado' });
-            }
-            console.error("Error en handleInvitation", error);
-            return response.status(500).json({ ok: false, status: 500, message: "Error interno del servidor" });
+            next(error);
         }
     }
 
-    async getMembersList(request, response) {
+    async getMembersList(request, response, next) {
         try {
             const { workspace_id } = request.params;
             const members = await workspaceMemberRepository.getMemberList(workspace_id);
@@ -104,12 +99,11 @@ class MemberController {
                 data: { members }
             });
         } catch (error) {
-            console.error("Error en getMembersList", error);
-            return response.status(500).json({ ok: false, status: 500, message: "Error interno del servidor" });
+            next(error);
         }
     }
 
-    async deleteMember(request, response) {
+    async deleteMember(request, response, next) {
         try {
             const { member_id } = request.params;
             const authenticatedUserMember = request.workspaceMembership;
@@ -141,12 +135,11 @@ class MemberController {
                 message: "Miembro eliminado exitosamente"
             });
         } catch (error) {
-            console.error("Error en deleteMember", error);
-            return response.status(500).json({ ok: false, status: 500, message: "Error interno del servidor" });
+            next(error);
         }
     }
 
-    async updateMemberRole(request, response) {
+    async updateMemberRole(request, response, next) {
         try {
             const { member_id } = request.params;
             const { role } = request.body;
@@ -186,8 +179,7 @@ class MemberController {
                 }
             });
         } catch (error) {
-            console.error("Error en updateMemberRole", error);
-            return response.status(500).json({ ok: false, status: 500, message: "Error interno del servidor" });
+            next(error);
         }
     }
 }

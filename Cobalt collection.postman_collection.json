@@ -1,0 +1,884 @@
+{
+	"info": {
+		"_postman_id": "071b1962-558f-44d7-ad81-8a99df55eb79",
+		"name": "Cobalt collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "52707955",
+		"_collection_link": "https://xenoazure-6468690.postman.co/workspace/Xeno-Azure's-Workspace~6406da29-b371-448d-832b-e050485a08d7/collection/52707955-071b1962-558f-44d7-ad81-8a99df55eb79?action=share&source=collection_link&creator=52707955"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Higan Retour\", \n    \"email\": \"higan.retour.pofv@gmail.com\", \n    \"password\": \"0015komachi\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"if (response.ok && response.data.auth_token) {",
+									"    pm.environment.set(\"auth_token\", response.data.auth_token);",
+									"    console.log(\"Auth token guardado automáticamente en el entorno.\");",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"higan.retour.pofv@gmail.com\", \n    \"password\": \"0015komachi\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Email",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/verify-email?verify_email_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhpZ2FuLnJldG91ci5wb2Z2QGdtYWlsLmNvbSIsIm5hbWUiOiJIaWdhbiBSZXRvdXIiLCJpYXQiOjE3NzcxMDYzMDEsImV4cCI6MTc3NzcxMTEwMX0.IzoiOnM7hgExGaOHI7Qv9QQja-SiUStamX-bbCUECdY",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"verify-email"
+							],
+							"query": [
+								{
+									"key": "verify_email_token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhpZ2FuLnJldG91ci5wb2Z2QGdtYWlsLmNvbSIsIm5hbWUiOiJIaWdhbiBSZXRvdXIiLCJpYXQiOjE3NzcxMDYzMDEsImV4cCI6MTc3NzcxMTEwMX0.IzoiOnM7hgExGaOHI7Qv9QQja-SiUStamX-bbCUECdY"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"higan.retour.pofv@gmail.com\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reset-password-request",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reset-password-request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"0015komachi\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reset-password/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhpZ2FuLnJldG91ci5wb2Z2QGdtYWlsLmNvbSIsImlhdCI6MTc3NzEwOTg2MywiZXhwIjoxNzc3MTk2MjYzfQ.N9L-cS1MqY2hXOq6tPEIsE_X2yqHSvghKRyS-0cbSAw",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reset-password",
+								"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhpZ2FuLnJldG91ci5wb2Z2QGdtYWlsLmNvbSIsImlhdCI6MTc3NzEwOTg2MywiZXhwIjoxNzc3MTk2MjYzfQ.N9L-cS1MqY2hXOq6tPEIsE_X2yqHSvghKRyS-0cbSAw"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get Profile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"...\", \n    \"bio\": \"...\", \n    \"profile_picture\": \"...\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"friend_public_id\": \"...\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user/friends",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"friends"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept/Decline/Block Friend Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user/friends/requests/:request_id/accept",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"friends",
+								"requests",
+								":request_id",
+								"accept"
+							],
+							"variable": [
+								{
+									"key": "request_id",
+									"value": "69dea8ba7e195e72ea3f6136"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Workspace",
+			"item": [
+				{
+					"name": "List Workspaces",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/workspace",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workspace"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Workspace",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"...\", \n    \"description\": \"...\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/workspace",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workspace"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Workspace By ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/workspace/:workspace_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workspace",
+								":workspace_id"
+							],
+							"variable": [
+								{
+									"key": "workspace_id",
+									"value": "69ec9faca12bcce4694e2ed4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete/Update Workspace",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/workspace/:workspace_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workspace",
+								":workspace_id"
+							],
+							"variable": [
+								{
+									"key": "workspace_id",
+									"value": "69ec9faca12bcce4694e2ed4"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Channels and Messages",
+			"item": [
+				{
+					"name": "List Channels",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/workspace/:workspace_id/channel",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workspace",
+								":workspace_id",
+								"channel"
+							],
+							"variable": [
+								{
+									"key": "workspace_id",
+									"value": "69eca11ca12bcce4694e2edc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create channel",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"...\",\n     \"description\": \"...\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/workspace/:workspace_id/channel",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workspace",
+								":workspace_id",
+								"channel"
+							],
+							"variable": [
+								{
+									"key": "workspace_id",
+									"value": "69eca11ca12bcce4694e2edc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Messages",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/workspace/:workspace_id/channel/:channel_id/message",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workspace",
+								":workspace_id",
+								"channel",
+								":channel_id",
+								"message"
+							],
+							"variable": [
+								{
+									"key": "workspace_id",
+									"value": "69eca11ca12bcce4694e2edc"
+								},
+								{
+									"key": "channel_id",
+									"value": "69eca11da12bcce4694e2ee0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Message",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"...\", \n    \"attachment\": \"...\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/workspace/:workspace_id/channel/:channel_id/message",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workspace",
+								":workspace_id",
+								"channel",
+								":channel_id",
+								"message"
+							],
+							"variable": [
+								{
+									"key": "workspace_id",
+									"value": "69eca11ca12bcce4694e2edc"
+								},
+								{
+									"key": "channel_id",
+									"value": "69eca11da12bcce4694e2ee0"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tasks",
+			"item": [
+				{
+					"name": "List Tasks",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/workspace/:workspace_id/task",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workspace",
+								":workspace_id",
+								"task"
+							],
+							"variable": [
+								{
+									"key": "workspace_id",
+									"value": "69eca11ca12bcce4694e2edc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Task",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"...\",\n    \"description\": \"...\", \n    \"subtasks\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/workspace/:workspace_id/task",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"workspace",
+								":workspace_id",
+								"task"
+							],
+							"variable": [
+								{
+									"key": "workspace_id",
+									"value": "69eca11ca12bcce4694e2edc"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Direct Messages",
+			"item": [
+				{
+					"name": "Get DM History",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/dm/:friend_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dm",
+								":friend_id"
+							],
+							"variable": [
+								{
+									"key": "friend_id",
+									"value": "69dea8ba7e195e72ea3f6136"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send DM",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"...\", \n    \"attachment\": \"...\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/dm/:friend_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dm",
+								":friend_id"
+							],
+							"variable": [
+								{
+									"key": "friend_id",
+									"value": "69dea8ba7e195e72ea3f6136"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

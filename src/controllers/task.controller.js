@@ -2,7 +2,7 @@ import taskRepository from "../repository/task.repository.js";
 import ServerError from "../helpers/error.helper.js";
 
 class TaskController {
-    async createTask(request, response) {
+    async createTask(request, response, next) {
         try {
             const { workspace_id } = request.params;
             const { title, description, subtasks } = request.body;
@@ -18,12 +18,11 @@ class TaskController {
                 ok: true, status: 201, message: "Task created successfully", data: { task }
             });
         } catch (error) {
-            console.error("Error in createTask", error);
-            return response.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
 
-    async getTasks(request, response) {
+    async getTasks(request, response, next) {
         try {
             const { workspace_id } = request.params;
             const tasks = await taskRepository.getTasksByWorkspaceId(workspace_id);
@@ -32,12 +31,11 @@ class TaskController {
                 ok: true, status: 200, message: "Tasks retrieved successfully", data: { tasks }
             });
         } catch (error) {
-            console.error("Error in getTasks", error);
-            return response.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
 
-    async updateTask(request, response) {
+    async updateTask(request, response, next) {
         try {
             const { task_id } = request.params;
             const updateProps = request.body;
@@ -48,12 +46,11 @@ class TaskController {
                 ok: true, status: 200, message: "Task updated successfully", data: { task }
             });
         } catch (error) {
-            console.error("Error in updateTask", error);
-            return response.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
 
-    async deleteTask(request, response) {
+    async deleteTask(request, response, next) {
         try {
             const { task_id } = request.params;
             await taskRepository.deleteById(task_id);
@@ -62,8 +59,7 @@ class TaskController {
                 ok: true, status: 200, message: "Task deleted successfully"
             });
         } catch (error) {
-            console.error("Error in deleteTask", error);
-            return response.status(500).json({ ok: false, status: 500, message: "Internal server error" });
+            next(error);
         }
     }
 }

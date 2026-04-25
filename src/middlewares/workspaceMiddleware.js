@@ -18,12 +18,7 @@ const verifyMemberWorkspaceMiddleware = async (request, response, next) => {
         request.workspaceMembership = member;
         next();
     } catch (error) {
-        console.error("Error en verifyMemberWorkspaceMiddleware", error);
-        return response.status(500).json({
-            ok: false,
-            status: 500,
-            message: "Error interno del servidor"
-        });
+        next(error);
     }
 };
 
@@ -59,12 +54,7 @@ export const verifyMemberWorkspaceRoleMiddleware = (roles_allowed) => {
 
             next();
         } catch (error) {
-            console.error("Error en verifyMemberWorkspaceRoleMiddleware", error);
-            return response.status(500).json({
-                ok: false,
-                status: 500,
-                message: "Error interno del servidor"
-            });
+            next(error);
         }
     };
 };
@@ -88,12 +78,7 @@ export const verifyChannelMiddleware = async (request, response, next) => {
         request.channel = channel;
         next();
     } catch (error) {
-        console.error("Error en verifyChannelMiddleware", error);
-        return response.status(500).json({
-            ok: false,
-            status: 500,
-            message: "Error interno del servidor"
-        });
+        next(error);
     }
 };
 
