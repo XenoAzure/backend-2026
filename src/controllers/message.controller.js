@@ -4,26 +4,24 @@ class MessageController {
     async createMessage(request, response) {
         try {
             const { channel_id } = request.params;
-            const { content } = request.body;
-            const member = request.workspaceMembership; // Injected by verifyMemberWorkspaceMiddleware
+            const { content, attachment } = request.body;
+            const member = request.workspaceMembership;
 
-            if (!content) {
+            if (!content && !attachment) {
                 return response.status(400).json({
                     ok: false,
                     status: 400,
-                    message: "El contenido del mensaje es requerido"
+                    message: "El mensaje debe tener contenido o un archivo adjunto"
                 });
             }
 
-            const message = await messageRepository.create(channel_id, member._id, content);
+            const message = await messageRepository.create(channel_id, member._id, content || "", attachment || null);
 
             return response.status(201).json({
                 ok: true,
                 status: 201,
                 message: "Mensaje enviado exitosamente",
-                data: {
-                    message
-                }
+                data: { message }
             });
         } catch (error) {
             console.error("Error en createMessage", error);
@@ -44,12 +42,15 @@ class MessageController {
             const mappedMessages = messages.map(msg => ({
                 message_id: msg._id,
                 content: msg.content,
+                attachment: msg.attachment || null,
                 created_at: msg.created_at,
                 member: {
                     member_id: msg.fk_id_member._id,
+                    user_id: msg.fk_id_member.fk_id_user._id,
                     role: msg.fk_id_member.role,
                     user_name: msg.fk_id_member.fk_id_user.name,
-                    user_email: msg.fk_id_member.fk_id_user.email
+                    user_email: msg.fk_id_member.fk_id_user.email,
+                    user_profile_picture: msg.fk_id_member.fk_id_user.profile_picture || null
                 }
             }));
 
@@ -57,9 +58,7 @@ class MessageController {
                 ok: true,
                 status: 200,
                 message: "Mensajes obtenidos exitosamente",
-                data: {
-                    messages: mappedMessages
-                }
+                data: { messages: mappedMessages }
             });
         } catch (error) {
             console.error("Error en getMessages", error);

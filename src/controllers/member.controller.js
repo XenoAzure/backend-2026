@@ -8,65 +8,48 @@ class MemberController {
     async inviteMember(request, response) {
         try {
             const { workspace_id } = request.params;
-            const { email, role } = request.body;
+            const { email_or_id, role = 'user' } = request.body;
 
-            if (!email || !role) {
-                return response.status(400).json({ ok: false, status: 400, message: "Email y role son requeridos" });
+            if (!email_or_id) {
+                return response.status(400).json({ ok: false, status: 400, message: "Se requiere email o ID público del usuario" });
             }
 
-            const invitedUser = await userRepository.getByEmail(email);
+            // Only allow valid roles (not owner)
+            const allowedRoles = ['user', 'admin'];
+            if (!allowedRoles.includes(role.toLowerCase())) {
+                return response.status(400).json({ ok: false, status: 400, message: "Rol inválido. Solo se permiten: user, admin" });
+            }
+
+            // Look up user by email first, then by public_id
+            let invitedUser = await userRepository.getByEmail(email_or_id.trim());
             if (!invitedUser) {
-                return response.status(404).json({ ok: false, status: 404, message: "El usuario invitado no existe en el sistema" });
+                invitedUser = await userRepository.getByPublicId(email_or_id.trim().toUpperCase());
             }
 
-            // Verificar si el usuario ya es miembro (incluso pending)
+            if (!invitedUser) {
+                return response.status(404).json({ ok: false, status: 404, message: "Usuario no encontrado. Verifica el email o el ID público." });
+            }
+
+            // Check if already a member
             const existingMember = await workspaceMemberRepository.getMemberByWorkspaceAndUserId(workspace_id, invitedUser._id);
             if (existingMember) {
-                return response.status(400).json({ ok: false, status: 400, message: "El usuario ya fue invitado o es miembro de este espacio de trabajo" });
+                return response.status(400).json({ ok: false, status: 400, message: "El usuario ya es miembro o tiene una invitación pendiente en este espacio de trabajo" });
             }
 
-            const memberDoc = await workspaceMemberRepository.create(workspace_id, invitedUser._id, role, 'pending');
-
-            const tokenAccept = jwt.sign(
-                { member_id: memberDoc._id, action: 'accepted' },
-                ENVIRONMENT.JWT_SECRET_KEY,
-                { expiresIn: '7d' }
-            );
-
-            const tokenReject = jwt.sign(
-                { member_id: memberDoc._id, action: 'rejected' },
-                ENVIRONMENT.JWT_SECRET_KEY,
-                { expiresIn: '7d' }
-            );
-
-            const linkAccept = `${ENVIRONMENT.URL_BACKEND}/api/workspace/${workspace_id}/member/handle-invitation?token=${tokenAccept}`;
-            const linkReject = `${ENVIRONMENT.URL_BACKEND}/api/workspace/${workspace_id}/member/handle-invitation?token=${tokenReject}`;
-
-            console.log("Tokens generados y correos listos para enviar:\nAccept:", linkAccept, "\nReject:", linkReject);
-
-            await mailerTransporter.sendMail({
-                from: ENVIRONMENT.MAIL_USER,
-                to: email,
-                subject: "Has sido invitado a unirte a un Espacio de Trabajo",
-                html: `
-                    <h1>Hola ${invitedUser.name}</h1>
-                    <p>Has sido invitado para unirte al espacio de trabajo. Haz click en el siguiente enlace para aceptar o rechazar:</p>
-                    <a href="${linkAccept}" style="padding:10px; background:green; color:white;">Aceptar Invitación</a>
-                    <br/><br/>
-                    <a href="${linkReject}" style="padding:10px; background:red; color:white;">Rechazar Invitación</a>
-                `
-            });
+            // Add directly as an active member
+            await workspaceMemberRepository.create(workspace_id, invitedUser._id, role.toLowerCase(), 'accepted');
 
             return response.status(200).json({
                 ok: true,
                 status: 200,
-                message: "Invitación enviada exitosamente al usuario"
+                message: `${invitedUser.name} ha sido añadido al espacio de trabajo como ${role.toLowerCase()}.`
             });
         } catch (error) {
             console.error("Error en inviteMember", error);
             return response.status(500).json({ ok: false, status: 500, message: "Error interno del servidor" });
         }
     }
+
 
     async handleInvitation(request, response) {
         try {

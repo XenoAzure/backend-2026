@@ -20,8 +20,8 @@ class UserController {
                 await user.save();
             }
 
-            user = await user.populate('friends', 'name email profile_picture public_id');
-            user = await user.populate('muted_friends', 'name email profile_picture public_id');
+            user = await user.populate('friends', 'name email profile_picture public_id bio social_links');
+            user = await user.populate('muted_friends', 'name email profile_picture public_id bio social_links');
             user = await user.populate('muted_workspaces', 'workspace_title');
             user = await user.populate('pending_requests', 'name email profile_picture public_id');
 

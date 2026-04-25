@@ -42,11 +42,10 @@ memberRouter.delete(
     memberController.deleteMember
 );
 
-// Actualizar rol de miembro
 memberRouter.put(
     '/:member_id',
     authMiddleware,
-    verifyMemberWorkspaceRoleMiddleware(['admin', 'owner']),
+    verifyMemberWorkspaceRoleMiddleware(['owner']),
     memberController.updateMemberRole
 );
 

@@ -1,6 +1,7 @@
 import ServerError from "../helpers/error.helper.js"
 import workspaceMemberRepository from "../repository/member.repository.js"
 import workspaceRepository from "../repository/workspace.repository.js"
+import channelRepository from "../repository/channel.repository.js"
 
 class WorkspaceController {
     async getWorkspaces(request, response) {
@@ -59,7 +60,9 @@ class WorkspaceController {
             }
 
             const workspace = await workspaceRepository.create(title, description, null, true);
-            await workspaceMemberRepository.create(workspace._id, user.id, 'admin');
+            await workspaceMemberRepository.create(workspace._id, user.id, 'owner');
+            // Auto-create the default group chat channel
+            await channelRepository.create(workspace._id, 'general', 'Workspace group chat');
 
             return response.status(200).json({
                 ok: true,

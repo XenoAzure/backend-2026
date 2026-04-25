@@ -22,7 +22,12 @@ const channelMessagesSchema = new mongoose.Schema({
     },
     content: {
         type: String,
-        required: true
+        default: ""
+    },
+    attachment: {
+        filename: String,
+        fileType: String,
+        data: String
     },
     created_at: {
         type: Date,

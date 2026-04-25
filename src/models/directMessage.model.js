@@ -14,7 +14,7 @@ const directMessageSchema = new mongoose.Schema(
         },
         content: {
             type: String,
-            required: true,
+            default: "",
         },
         created_at: {
             type: Date,
