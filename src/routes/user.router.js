@@ -13,5 +13,6 @@ userRouter.patch('/workspaces/:workspace_id/mute', authMiddleware, userControlle
 userRouter.post('/friends/requests/:request_id/accept', authMiddleware, userController.acceptFriendRequest);
 userRouter.post('/friends/requests/:request_id/decline', authMiddleware, userController.declineFriendRequest);
 userRouter.post('/friends/requests/:request_id/block', authMiddleware, userController.blockUser);
+userRouter.post('/friends/requests/:request_id/unblock', authMiddleware, userController.unblockUser);
 
 export default userRouter;

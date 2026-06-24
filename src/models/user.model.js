@@ -62,6 +62,9 @@ const userSchema = new mongoose.Schema(
         ],
         blocked_users: [
             { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        ],
+        friends_before_block: [
+            { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
         ]
     }
 )

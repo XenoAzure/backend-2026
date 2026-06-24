@@ -24,6 +24,7 @@ class UserController {
             user = await user.populate('muted_friends', 'name email profile_picture public_id bio social_links');
             user = await user.populate('muted_workspaces', 'workspace_title');
             user = await user.populate('pending_requests', 'name email profile_picture public_id');
+            user = await user.populate('blocked_users', 'name email profile_picture public_id bio social_links');
 
             return res.status(200).json({
                 ok: true,
@@ -41,6 +42,7 @@ class UserController {
                         muted_friends: user.muted_friends,
                         muted_workspaces: user.muted_workspaces,
                         pending_requests: user.pending_requests,
+                        blocked_users: user.blocked_users,
                         created_at: user.created_at
                     }
                 }
@@ -256,6 +258,16 @@ class UserController {
                 user.blocked_users.push(request_id);
             }
 
+            // If they were friends, add to friends_before_block to restore on unblock
+            if (user.friends.includes(request_id)) {
+                if (!user.friends_before_block) {
+                    user.friends_before_block = [];
+                }
+                if (!user.friends_before_block.includes(request_id)) {
+                    user.friends_before_block.push(request_id);
+                }
+            }
+
             // Remove from friends if they were friends
             user.friends = user.friends.filter(id => id.toString() !== request_id);
 
@@ -273,6 +285,41 @@ class UserController {
             next(error);
         }
     }
+
+    async unblockUser(req, res, next) {
+        try {
+            const user_id = req.user.id;
+            const { request_id } = req.params;
+
+            const user = await userRepository.getById(user_id);
+            if (!user) {
+                throw new ServerError("Usuario no encontrado", 404);
+            }
+
+            // Restore friendship if they were friends before block
+            if (user.friends_before_block && user.friends_before_block.includes(request_id)) {
+                if (!user.friends.includes(request_id)) {
+                    user.friends.push(request_id);
+                }
+                user.friends_before_block = user.friends_before_block.filter(id => id.toString() !== request_id);
+
+                // Also restore A in B's friends list
+                const blockedUserObj = await userRepository.getById(request_id);
+                if (blockedUserObj && !blockedUserObj.friends.includes(user_id)) {
+                    blockedUserObj.friends.push(user_id);
+                    await blockedUserObj.save();
+                }
+            }
+
+            user.blocked_users = user.blocked_users.filter(id => id.toString() !== request_id);
+            await user.save();
+
+            return res.status(200).json({ ok: true, status: 200, message: "Usuario desbloqueado" });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async updatePassword(req, res, next) {
         try {
             const user_id = req.user.id;
